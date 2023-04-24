@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  name = 'Angular';
+  name = 'AngularDashboardDemo';
 
   constructor() {}
 }

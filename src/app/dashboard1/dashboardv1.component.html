@@ -1,0 +1,639 @@
+<!--<div class="row">
+  <div class="col-md-10"></div>
+  <div class="col-md-2">
+    <button type="button" title="Download All" (click)="openPDF('allChart','AllChart')" class="btn btn-secondary btn-sm"
+            style="float:right">
+      <i class="fa fa-download"></i>
+    </button>
+  </div>
+</div>-->
+
+<br />
+
+<div id="allChart">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="card-title" style="float:left">LEI Type</h5>
+          <div style="float:right">
+            <button
+              type="button"
+              title="Refresh"
+              (click)="refreshTypeChart()"
+              class="btn btn-secondary btn-sm"
+              style="margin-right:5px"
+            >
+              <i class="fa fa-refresh"></i>
+            </button>
+            <button
+              type="button"
+              title="Download"
+              (click)="openPDF('barchartLEIType', 'LEITypeBarChart')"
+              class="btn btn-secondary btn-sm"
+              style="float:right"
+            >
+              <i class="fa fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body" id="barchartLEIType">
+          <ngx-charts-bar-vertical
+            class="chart-container"
+            [view]="[271, 300]"
+            [scheme]="colorScheme"
+            [schemeType]="schemeType"
+            [customColors]="customColors"
+            [results]="LEIType"
+            [animations]="animations"
+            [gradient]="gradient"
+            [xAxis]="showXAxis"
+            [yAxis]="showYAxis"
+            [legend]="showLegend"
+            legendTitle="LEI Type"
+            [legendPosition]="legendPosition"
+            [showXAxisLabel]="false"
+            [showYAxisLabel]="showYAxisLabel"
+            [tooltipDisabled]="tooltipDisabled"
+            xAxisLabel="LEI Type"
+            yAxisLabel="Count"
+            [showGridLines]="showGridLines"
+            [barPadding]="barPadding"
+            [roundDomains]="roundDomains"
+            [roundEdges]="roundEdges"
+            [yScaleMax]="yScaleMax"
+            [noBarWhenZero]="noBarWhenZero"
+            [showDataLabel]="showDataLabel"
+            [trimXAxisTicks]="trimXAxisTicks"
+            [trimYAxisTicks]="trimYAxisTicks"
+            [rotateXAxisTicks]="rotateXAxisTicks"
+            [maxXAxisTickLength]="maxXAxisTickLength"
+            [maxYAxisTickLength]="maxYAxisTickLength"
+            (select)="selectLEIType($event)"
+            (activate)="activate($event)"
+            (deactivate)="deactivate($event)"
+          >
+          </ngx-charts-bar-vertical>
+
+          <br /><br /><br />
+        </div>
+        <!--<div class="card-footer text-muted">2 days ago</div>-->
+      </div>
+    </div>
+
+    <div class="col-md-9">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5
+            class="card-title"
+            style="float:left"
+            *ngIf="LEITypeSelected == null || LEITypeSelected == ''"
+          >
+            LEI Data by LEI Type
+          </h5>
+          <h5
+            class="card-title"
+            style="float:left"
+            *ngIf="LEITypeSelected != null && LEITypeSelected != ''"
+          >
+            LEI Data by LEI Type : {{ LEITypeSelected }}
+          </h5>
+          <div style="float:right">
+            <button
+              type="button"
+              title="Export Excel"
+              (click)="exportToExcel('LEIType')"
+              class="btn btn-secondary btn-sm"
+              style="margin-right:5px"
+            >
+              <i class="fa fa-file-excel-o"></i>
+            </button>
+            <!--<button type="button" title="Download" (click)="openPDF('tableLEIType','LEITypeData')" class="btn btn-secondary btn-sm" style="float:right">
+              <i class="fa fa-download"></i>
+            </button>-->
+          </div>
+        </div>
+        <div class="card-body" id="tableLEIType">
+          <ul ngbNav #navType="ngbNav" class="nav-tabs customTab">
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIType('Daily')">
+                Daily
+              </button>
+              <ng-template ngbNavContent>
+                <app-generic-table-devextreme
+                  [columns]="columnsSelected"
+                  [data]="LEITypeDailyData"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="false"
+                  tableId="tblLEITypeDailyData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIType('Monthly')">
+                Monthly
+              </button>
+              <ng-template ngbNavContent>
+                <app-generic-table-devextreme
+                  [columns]="columnsSelected"
+                  [data]="LEITypeMonthlyData"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="false"
+                  tableId="tblLEITypeMonthlyData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIType('All')">All</button>
+              <ng-template ngbNavContent>
+                <app-generic-table-devextreme
+                  [columns]="columnsSelected"
+                  [data]="LEIDataByType"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="false"
+                  tableId="tblLEITypeAllData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+          </ul>
+          <div [ngbNavOutlet]="navType"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="card-title" style="float:left">LEI Status</h5>
+          <div style="float:right">
+            <button
+              type="button"
+              title="Refresh"
+              (click)="refreshStatusChart()"
+              class="btn btn-secondary btn-sm"
+              style="margin-right:5px"
+            >
+              <i class="fa fa-refresh"></i>
+            </button>
+            <button
+              type="button"
+              title="Download"
+              (click)="openPDF('piechartStatus', 'LEIStatusPieChart')"
+              class="btn btn-secondary btn-sm"
+            >
+              <i class="fa fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body" id="piechartStatus">
+          <ngx-charts-pie-chart
+            class="chart-container"
+            [view]="[381, 300]"
+            [scheme]="colorSchemeStatus"
+            [results]="LEIStatus"
+            [animations]="animations"
+            [legend]="showLegend"
+            legendTitle="LEI Status"
+            [legendPosition]="legendPosition"
+            [explodeSlices]="explodeSlices"
+            [labels]="showLabels"
+            [doughnut]="doughnut"
+            [arcWidth]="arcWidth"
+            [gradient]="gradient"
+            [tooltipDisabled]="tooltipDisabled"
+            [tooltipText]="pieTooltipText"
+            (dblclick)="dblclick($event)"
+            (select)="selectLEIStatus($event)"
+            (activate)="activate($event)"
+            (deactivate)="deactivate($event)"
+          >
+          </ngx-charts-pie-chart>
+
+          <br /><br /><br />
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5
+            class="card-title"
+            style="float:left"
+            *ngIf="LEIStatusSelected == null || LEIStatusSelected == ''"
+          >
+            LEI Data by LEI Status
+          </h5>
+          <h5
+            class="card-title"
+            style="float:left"
+            *ngIf="LEIStatusSelected != null && LEIStatusSelected != ''"
+          >
+            LEI Data by LEI Status : {{ LEIStatusSelected }}
+          </h5>
+          <div style="float:right">
+            <button
+              type="button"
+              title="Export Excel"
+              (click)="exportToExcel('LEIStatus')"
+              class="btn btn-secondary btn-sm"
+              style="margin-right:5px"
+            >
+              <i class="fa fa-file-excel-o"></i>
+            </button>
+            <!--<button type="button" title="Download" (click)="openPDF('tableLEIStatus','LEIStatusData')" class="btn btn-secondary btn-sm" style="float:right">
+              <i class="fa fa-download"></i>
+            </button>-->
+          </div>
+        </div>
+        <div class="card-body" id="tableLEIStatus">
+          <ul ngbNav #navStatus="ngbNav" class="nav-tabs customTab">
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIStatus('Daily')">
+                Daily
+              </button>
+              <ng-template ngbNavContent>
+                <app-generic-table-devextreme
+                  [columns]="columnsSelected"
+                  [data]="LEIStatusDailyData"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="false"
+                  tableId="tblLEIStatusDailyData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIStatus('Monthly')">
+                Monthly
+              </button>
+              <ng-template ngbNavContent>
+                <app-generic-table-devextreme
+                  [columns]="columnsSelected"
+                  [data]="LEIStatusMonthlyData"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="false"
+                  tableId="tblLEIStatusMonthlyData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIStatus('All')">
+                All
+              </button>
+              <ng-template ngbNavContent>
+                <app-generic-table-devextreme
+                  [columns]="columnsSelected"
+                  [data]="LEIDataByStatus"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="false"
+                  tableId="tblLEIStatusAllData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+          </ul>
+          <div [ngbNavOutlet]="navStatus"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="card-title" style="float:left">LEI Country</h5>
+          <button
+            type="button"
+            title="Download"
+            (click)="openPDF('barchartCountry', 'CountryBarChart')"
+            class="btn btn-secondary btn-sm"
+            style="float:right"
+          >
+            <i class="fa fa-download"></i>
+          </button>
+        </div>
+        <div class="card-body" id="barchartCountry">
+          <ngx-charts-bar-vertical
+            class="chart-container"
+            [scheme]="colorSchemePie"
+            [schemeType]="schemeType"
+            [customColors]="customColors"
+            [results]="LEICountry"
+            [animations]="animations"
+            [gradient]="gradient"
+            [xAxis]="showXAxis"
+            [yAxis]="showYAxis"
+            [legend]="showLegend"
+            legendTitle="LEI Counties"
+            [legendPosition]="legendPositionRight"
+            [showXAxisLabel]="false"
+            [showYAxisLabel]="showYAxisLabel"
+            [tooltipDisabled]="tooltipDisabled"
+            xAxisLabel="LEI Country"
+            yAxisLabel="LEI Country Count"
+            [showGridLines]="showGridLines"
+            [barPadding]="barPadding"
+            [roundDomains]="roundDomains"
+            [roundEdges]="roundEdges"
+            [yScaleMax]="yScaleMax"
+            [noBarWhenZero]="noBarWhenZero"
+            [showDataLabel]="showDataLabel"
+            [trimXAxisTicks]="trimXAxisTicks"
+            [trimYAxisTicks]="trimYAxisTicks"
+            [rotateXAxisTicks]="rotateXAxisTicks"
+            [maxXAxisTickLength]="maxXAxisTickLength"
+            [maxYAxisTickLength]="maxYAxisTickLength"
+            (select)="select($event)"
+            (activate)="activate($event)"
+            (deactivate)="deactivate($event)"
+          >
+          </ngx-charts-bar-vertical>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="card-title" style="float:left">
+            LEI Trend On Creation Date
+          </h5>
+          <button
+            type="button"
+            title="Download"
+            (click)="openPDF('trendChartLEI', 'TrendChart')"
+            class="btn btn-secondary btn-sm"
+            style="float:right"
+          >
+            <i class="fa fa-download"></i>
+          </button>
+        </div>
+        <div class="card-body" id="trendChartLEI">
+          <ul ngbNav #navTrend="ngbNav" class="nav-tabs customTab">
+            <li ngbNavItem>
+              <button ngbNavLink>Monthly</button>
+              <ng-template ngbNavContent>
+                <br />
+                <ngx-charts-line-chart
+                  class="chart-container"
+                  [scheme]="colorScheme"
+                  [schemeType]="schemeType"
+                  [results]="leiTrendDataCurrentMonth"
+                  [animations]="animations"
+                  [legend]="showLegend"
+                  legendTitle="LEI Creation Date"
+                  [legendPosition]="legendPositionRight"
+                  [gradient]="gradient"
+                  [xAxis]="showXAxis"
+                  [yAxis]="showYAxis"
+                  [showXAxisLabel]="showXAxisLabel"
+                  [showYAxisLabel]="showYAxisLabel"
+                  xAxisLabel="Creation Date"
+                  yAxisLabel="LEI Count"
+                  [autoScale]="autoScale"
+                  [xScaleMin]="xScaleMin"
+                  [xScaleMax]="xScaleMax"
+                  [yScaleMin]="yScaleMin"
+                  [yScaleMax]="yScaleMax"
+                  [timeline]="timeline"
+                  [showGridLines]="showGridLines"
+                  [curve]="curve"
+                  [rangeFillOpacity]="rangeFillOpacity"
+                  [roundDomains]="roundDomains"
+                  [tooltipDisabled]="tooltipDisabled"
+                  [trimXAxisTicks]="trimXAxisTicks"
+                  [trimYAxisTicks]="trimYAxisTicks"
+                  [rotateXAxisTicks]="rotateXAxisTicks"
+                  [maxXAxisTickLength]="maxXAxisTickLength"
+                  [maxYAxisTickLength]="maxYAxisTickLength"
+                  (select)="select($event)"
+                  (activate)="activate($event)"
+                  (deactivate)="deactivate($event)"
+                >
+                </ngx-charts-line-chart>
+              </ng-template>
+            </li>
+            <li ngbNavItem>
+              <button ngbNavLink>Yearly</button>
+              <ng-template ngbNavContent>
+                <br />
+                <ngx-charts-line-chart
+                  class="chart-container"
+                  [scheme]="colorScheme"
+                  [schemeType]="schemeType"
+                  [results]="leiTrendDataYearly"
+                  [animations]="animations"
+                  [legend]="showLegend"
+                  legendTitle="LEI Creation Date"
+                  [legendPosition]="legendPositionRight"
+                  [gradient]="gradient"
+                  [xAxis]="showXAxis"
+                  [yAxis]="showYAxis"
+                  [showXAxisLabel]="showXAxisLabel"
+                  [showYAxisLabel]="showYAxisLabel"
+                  xAxisLabel="Creation Date"
+                  yAxisLabel="LEI Count"
+                  [autoScale]="autoScale"
+                  [xScaleMin]="xScaleMin"
+                  [xScaleMax]="xScaleMax"
+                  [yScaleMin]="yScaleMin"
+                  [yScaleMax]="yScaleMax"
+                  [timeline]="timeline"
+                  [showGridLines]="showGridLines"
+                  [curve]="curve"
+                  [rangeFillOpacity]="rangeFillOpacity"
+                  [roundDomains]="roundDomains"
+                  [tooltipDisabled]="tooltipDisabled"
+                  [trimXAxisTicks]="trimXAxisTicks"
+                  [trimYAxisTicks]="trimYAxisTicks"
+                  [rotateXAxisTicks]="rotateXAxisTicks"
+                  [maxXAxisTickLength]="maxXAxisTickLength"
+                  [maxYAxisTickLength]="maxYAxisTickLength"
+                  (select)="select($event)"
+                  (activate)="activate($event)"
+                  (deactivate)="deactivate($event)"
+                >
+                </ngx-charts-line-chart>
+              </ng-template>
+            </li>
+          </ul>
+          <div [ngbNavOutlet]="navTrend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <br />
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card bg-light">
+        <div class="card-header">
+          <h5 class="card-title" style="float:left">LEI Data</h5>
+          <div style="float:right" *ngIf="showExportIcon">
+            <button
+              type="button"
+              title="Export Excel"
+              (click)="exportToExcel('LEIData')"
+              class="btn btn-secondary btn-sm"
+              style="margin-right:5px"
+            >
+              <i class="fa fa-file-excel-o"></i>
+            </button>
+            <!--<button type="button" title="Download" (click)="openPDF('upcomingLEIRenewalExpired','LEIData')" class="btn btn-secondary btn-sm" style="float:right">
+              <i class="fa fa-download"></i>
+            </button>-->
+          </div>
+        </div>
+        <div class="card-body">
+          <ul ngbNav #navLEI="ngbNav" class="nav-tabs customTab">
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIData('MemberLEI')">
+                Member LEI
+              </button>
+              <ng-template ngbNavContent>
+                <br />
+                <div class="row">
+                  <div class="col-md-2">
+                    <label>Month and Year</label>
+                    <input
+                      [formControl]="dateMember"
+                      autocomplete="off"
+                      class="form-control"
+                      name="date"
+                      [maxDate]="maxDate"
+                      bsDatepicker
+                      [bsConfig]="{
+                        dateInputFormat: 'MM/YYYY',
+                        containerClass: 'theme-default'
+                      }"
+                      (onShown)="onOpenCalendar($event)"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <button
+                      type="submit"
+                      title="Filter"
+                      class="btn btn-secondary btn-sm"
+                      (click)="FilterMemberData()"
+                      style="margin-left: 12px;margin-bottom: 16px;margin-top:10%"
+                    >
+                      <i class="fa fa-search">&nbsp;&nbsp;Filter</i>
+                    </button>
+                  </div>
+                  <div class="col-md-8"></div>
+                </div>
+
+                <app-generic-table-devextreme
+                  [columns]="columnsMember"
+                  [data]="listMembersLEI"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="true"
+                  [childTableColumns]="childTableDataMember"
+                  tableId="tblMemberLEIData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+            <li ngbNavItem>
+              <button ngbNavLink (click)="tabChangedLEIData('PublicLEI')">
+                Public LEI
+              </button>
+              <ng-template ngbNavContent>
+                <br />
+                <div class="row">
+                  <div class="col-md-2">
+                    <label>Month and Year</label>
+                    <input
+                      [formControl]="datePublic"
+                      autocomplete="off"
+                      class="form-control"
+                      name="date"
+                      [maxDate]="maxDate"
+                      bsDatepicker
+                      [bsConfig]="{
+                        dateInputFormat: 'MM/YYYY',
+                        containerClass: 'theme-default'
+                      }"
+                      (onShown)="onOpenCalendar($event)"
+                    />
+                  </div>
+                  <div class="col-md-2">
+                    <button
+                      type="submit"
+                      title="Filter"
+                      class="btn btn-secondary btn-sm"
+                      (click)="FilterPublicData()"
+                      style="margin-left: 12px; margin-bottom: 16px; margin-top: 10%"
+                    >
+                      <i class="fa fa-search">&nbsp;&nbsp;Filter</i>
+                    </button>
+                  </div>
+
+                  <div class="col-md-8"></div>
+                </div>
+                <app-generic-table-devextreme
+                  [columns]="columns"
+                  [data]="listPublicLEI"
+                  [pagination]="[5, 10, 25, 50, 100, 200]"
+                  [pageSize]="5"
+                  [filter]="true"
+                  [filterHeader]="true"
+                  [exportOption]="false"
+                  [childTable]="false"
+                  tableId="tblPublicLEIData"
+                >
+                </app-generic-table-devextreme>
+              </ng-template>
+            </li>
+          </ul>
+          <div [ngbNavOutlet]="navLEI"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+<dx-data-grid
+  [id]="tableId"
+  keyExpr=""
+  [dataSource]="dataSource"
+  [remoteOperations]="true"
+  [allowColumnReordering]="true"
+  [rowAlternationEnabled]="true"
+  [showBorders]="true"
+  (onExporting)="onExporting($event)"
+>
+  <!-- <dxo-selection mode="multiple"></dxo-selection> -->
+  <dxo-paging [pageSize]="pageSize"></dxo-paging>
+
+  <dxo-pager
+    [visible]="true"
+    [allowedPageSizes]="pagination"
+    [showPageSizeSelector]="true"
+    [showInfo]="true"
+    [showNavigationButtons]="true"
+  >
+  </dxo-pager>
+
+  <dxo-header-filter
+    [visible]="true"
+    [allowSearch]="filterHeader"
+  ></dxo-header-filter>
+
+  <dxo-search-panel
+    [visible]="true"
+    [highlightCaseSensitive]="filter"
+  ></dxo-search-panel>
+
+  <dxi-column
+    dataField="{{ column.columnDef }}"
+    caption="{{ column.header }}"
+    *ngFor="let column of columns"
+  ></dxi-column>
+
+  <dxo-export
+    [enabled]="exportOption"
+    [formats]="['pdf']"
+    [allowExportSelectedData]="true"
+  ></dxo-export>
+
+  <dxo-master-detail
+    [enabled]="childTable"
+    template="detail"
+  ></dxo-master-detail>
+  <div *dxTemplate="let dataSource of 'detail'">
+    <app-generic-table-devextreme
+      [columns]="childTableColumns"
+      [data]="dataSource.data.childData"
+      [pagination]="[5, 10, 25, 50, 100, 200]"
+      [pageSize]="5"
+      [filter]="true"
+      [filterHeader]="true"
+      [exportOption]="false"
+      [childTable]="false"
+      tableId="tblMemberChildLEIData"
+    >
+    </app-generic-table-devextreme>
+  </div>
+</dx-data-grid>
